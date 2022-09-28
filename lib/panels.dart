@@ -47,13 +47,16 @@ class PanelsManager extends StatefulWidget {
   final bool debug;
   final PanelsThemeData? themeData;
 
+  final Function(BuildContext)? initCallback;
+
   PanelsManager({
     Key? key,
     this.debug = false,
     this.children,
     this.childrenOnTop,
     this.initialPanels,
-    this.themeData
+    this.themeData,
+    this.initCallback,
   }) : super(key: key);
 
   @override
@@ -63,12 +66,13 @@ class PanelsManager extends StatefulWidget {
 class _PanelsManagerState extends State<PanelsManager> {
   List<Widget> currentPanels = [];
   Map<Key, Widget> panelsMap = Map<Key, Panel>();
-  late Key? currentlySelectedPanelKey;
+  Key? currentlySelectedPanelKey;
 
   @override
   void initState() {
-    populateWithDebugPanels();
-
+    if (widget.debug) {
+      populateWithDebugPanels();
+    }
     widget.initialPanels?.forEach((element) {
       addPanel(element);
     });
@@ -161,6 +165,10 @@ class _PanelsManagerState extends State<PanelsManager> {
     if (PanelsTheme.of(context) == null) {
       return PanelsTheme(child: panels, data: widget.themeData ?? PanelsThemeData());
     }
+    if (widget.initCallback != null) {
+      widget.initCallback!(context);
+    }
+
 
     return panels;
   }
